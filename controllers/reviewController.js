@@ -139,10 +139,22 @@ module.exports.likeReviewComment = async (req, res) => {
 module.exports.searchReviews = async (req, res) => {
     try {
         const { query: q } = req.query;
-        const reviewsQuery = query(reviewCollection, where('keywords', 'array-contains', q));
-        const reviewsSnapshot = await getDocs(reviewsQuery);
-        const reviews = reviewsSnapshot.docs.map(doc => {return {id: doc.id, ...doc.data()}});
-        res.status(200).json(reviews);
+        const queryWords = q.toLowerCase().split(' ');
+        const result = []
+        const set = new Set();
+        for (const q of queryWords) {
+            const data = await getDocs(query(reviewCollection, where('keywords', 'array-contains', q)));
+            const items = data.docs.map((i) => {
+                if (!set.has(i.id)) {
+                    return {
+                        id: i.id,
+                        ...i.data()
+                    }
+                }
+            })
+            result.push(...items);
+        }
+        res.status(200).json(result || []);
     } catch (error) {
         console.log(error);
         res.status(400).json({ error })
