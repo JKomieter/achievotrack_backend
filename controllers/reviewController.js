@@ -138,9 +138,9 @@ module.exports.likeReviewComment = async (req, res) => {
 
 module.exports.searchReviews = async (req, res) => {
     try {
-        const { query: q } = req.query;
-        const queryWords = q.toLowerCase().split(' ');
-        const result = []
+        const { query: searchWords } = req.query;
+        const queryWords = searchWords.toLowerCase().split(' ');
+        const result = [];
         const set = new Set();
         for (const q of queryWords) {
             const data = await getDocs(query(reviewCollection, where('keywords', 'array-contains', q)));
