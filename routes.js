@@ -3,7 +3,7 @@ const { signup, addAcademicDetails, getUser, login, logout, savePushToken, updat
 const {addSchedule, updateSchedule, getSchedules, deleteSchedule, markAsDone} = require("./controllers/scheduleController");
 const { addItem, getItems, getCart, addItemToCart, searchItem, getRelatedItems } = require("./controllers/marketController");
 const { addCourse, getCourses, getCourse, addScoreToCourse, editCourse, deleteCourse } = require("./controllers/courseController");
-const { addReview, getReviews, likeReview, commentOnReview, getReviewComments, likeReviewComment, searchReviews } = require("./controllers/reviewController");
+const { addReview, getReviews, likeReview, commentOnReview, getReviewComments, likeReviewComment, searchReviews, addFeedback } = require("./controllers/reviewController");
 
 router.post("/signup", signup);
 
@@ -66,5 +66,7 @@ router.get("/getReviewComments", getReviewComments)
 router.post("/likeReviewComment", likeReviewComment);
 
 router.get("/searchReviews", searchReviews);
+
+router.post('/addFeedback', addFeedback);
 
 module.exports = router;

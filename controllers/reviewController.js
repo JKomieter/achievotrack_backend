@@ -5,7 +5,7 @@ const reviewCollection = collection(db, "reviews");
 module.exports.addReview = async (req, res) => {
     try {
         const { userId, body, stars, course, instructor } = req.body;
-        const keywords = [...course.split(" "), ...instructor.split(" ")]
+        const keywords = [...course.toLowerCase().split(" "), ...instructor.toLowerCase().split(" ")]
         await addDoc(reviewCollection, {
             userId, 
             body, 
@@ -155,6 +155,24 @@ module.exports.searchReviews = async (req, res) => {
             result.push(...items);
         }
         res.status(200).json(result || []);
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ error })
+    }
+}
+
+module.exports.addFeedback = async (req, res) => {
+    try {
+        const { stars, feedback, userId } = req.body;
+        const feedbackCollection = collection(db, "feedbacks");
+        await addDoc(feedbackCollection, {
+            stars,
+            feedback,
+            userId,
+            createdAt: new Date
+        });
+
+        res.status(200).json({ message: "Feedback added successfully" });
     } catch (error) {
         console.log(error);
         res.status(400).json({ error })
