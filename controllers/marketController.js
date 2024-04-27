@@ -78,9 +78,16 @@ module.exports.getWishlist = async (req, res) => {
         const userDoc = doc(usersCollection, userId);
         const wishlistCollection = collection(userDoc, 'wishlist');
         const data = await getDocs(wishlistCollection);
+        const marketCollection = collection(db, 'market');
         const wishlist = [];
         for (const d of data.docs) {
-            wishlist.push({ id: d.id, ...d.data() })
+            const itemId = d.data().itemId;
+            const itemDoc = doc(marketCollection, itemId);
+            const item = await getDoc(itemDoc);
+            wishlist.push({
+                id: item.id,
+                ...item.data()
+            })
         }
         res.status(200).json(wishlist)
     } catch (error) {
