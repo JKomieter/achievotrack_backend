@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const { signup, addAcademicDetails, getUser, login, logout, savePushToken, updateProfilePic } = require("./controllers/userController");
 const {addSchedule, updateSchedule, getSchedules, deleteSchedule, markAsDone} = require("./controllers/scheduleController");
-const { addItem, getItems, getWishlist, showInterest, searchItem, getRelatedItems, addItemToWishlist } = require("./controllers/marketController");
+const { addItem, getItems, getWishlist, showItemInterest, searchItem, getRelatedItems, addItemToWishlist } = require("./controllers/marketController");
 const { addCourse, getCourses, getCourse, addScoreToCourse, editCourse, deleteCourse } = require("./controllers/courseController");
 const { addReview, getReviews, likeReview, commentOnReview, getReviewComments, likeReviewComment, searchReviews, addFeedback } = require("./controllers/reviewController");
 
@@ -37,8 +37,6 @@ router.get("/getWishlist", getWishlist);
 
 router.post("/addItemToWishlist", addItemToWishlist);
 
-router.post("/showInterest", showInterest);
-
 router.post("/getRelatedItems", getRelatedItems);
 
 router.get("/searchItem", searchItem);
@@ -70,5 +68,7 @@ router.post("/likeReviewComment", likeReviewComment);
 router.get("/searchReviews", searchReviews);
 
 router.post('/addFeedback', addFeedback);
+
+router.post("/showItemInterest", showItemInterest);
 
 module.exports = router;

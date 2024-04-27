@@ -62,8 +62,7 @@ module.exports.addItemToWishlist = async (req, res) => {
         const itemDoc = doc(marketCollection, itemId);
         const item = await getDoc(itemDoc);
         await addDoc(wishlistCollection, {
-            id: item.id,
-            ...item.data(),
+            itemId: item.id
         })
         res.status(200).json({ message: "Item added to wishlist successfully" })
     } catch (error) {
@@ -176,7 +175,8 @@ async function sendNotificationToSeller(sellerPushToken, wisher) {
     console.log('Push notification result:', result);
 }
 
-module.exports.showInterest = async (req, res) => {
+module.exports.showItemInterest = async (req, res) => {
+    console.log("showing interest")
     try {
         const { userId, itemId } = req.body;
         const marketCollection = collection(db, 'market');
@@ -188,12 +188,12 @@ module.exports.showInterest = async (req, res) => {
         const wisherData = await getDoc(wishersDoc);
         const wisher = {
             id: wisherData.id,
-            wisherName: wisherData.data().name,
+            wisherName: wisherData.data().username,
             wisherEmail: wisherData.data().email,
-            itemName: item.title
+            itemName: item.data().title
         }
 
-        const granterDoc = doc(usersCollection, item.sellerId);
+        const granterDoc = doc(usersCollection, item.data().sellerId);
         const granterData = await getDoc(granterDoc);
         const granter = granterData.data();
         // send notification to seller
