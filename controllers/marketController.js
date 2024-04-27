@@ -181,8 +181,7 @@ module.exports.showInterest = async (req, res) => {
         const { userId, itemId } = req.body;
         const marketCollection = collection(db, 'market');
         const itemDoc = doc(marketCollection, itemId);
-        const itemData = await getDoc(itemDoc);
-        const item = await getDoc(itemData);
+        const item = await getDoc(itemDoc);
 
         const usersCollection = collection(db, 'users');
         const wishersDoc = doc(usersCollection, userId);
