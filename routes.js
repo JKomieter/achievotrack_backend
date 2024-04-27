@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const { signup, addAcademicDetails, getUser, login, logout, savePushToken, updateProfilePic } = require("./controllers/userController");
 const {addSchedule, updateSchedule, getSchedules, deleteSchedule, markAsDone} = require("./controllers/scheduleController");
-const { addItem, getItems, getWishlist, showInterest, addItemToWishlist, searchItem, getRelatedItems, addItemToWishlist } = require("./controllers/marketController");
+const { addItem, getItems, getWishlist, showInterest, searchItem, getRelatedItems, addItemToWishlist } = require("./controllers/marketController");
 const { addCourse, getCourses, getCourse, addScoreToCourse, editCourse, deleteCourse } = require("./controllers/courseController");
 const { addReview, getReviews, likeReview, commentOnReview, getReviewComments, likeReviewComment, searchReviews, addFeedback } = require("./controllers/reviewController");
 
