@@ -1,5 +1,12 @@
-const { collection, addDoc, getDocs, doc, updateDoc, query, where } = require("firebase/firestore");
+const { collection, addDoc, getDocs, doc, getDoc, query, where } = require("firebase/firestore");
 const { db } = require("../config/firebase");
+require('dotenv').config();
+const { Expo } = require('expo-server-sdk');
+
+let expo = new Expo({
+    accessToken: process.env.EXPO_ACCESS_TOKEN,
+    useFcmV1: false
+});
 
 module.exports.addItem = async (req, res) => {
     try {
@@ -45,33 +52,38 @@ module.exports.getItems = async (req, res) => {
     }
 }
 
-module.exports.addItemToCart = async (req, res) => {
+module.exports.addItemToWishlist = async (req, res) => {
     try {
-        const { item, userId } = req.body;
+        const { itemId, userId } = req.body;
         const usersCollection = collection(db, 'users');
         const userDoc = doc(usersCollection, userId);
-        const cartCollection = collection(userDoc, 'cart');
-        await addDoc(cartCollection, {
-            ...item,
+        const wishlistCollection = collection(userDoc, 'wishlist');
+        const marketCollection = collection(db, 'market');
+        const itemDoc = doc(marketCollection, itemId);
+        const item = await getDoc(itemDoc);
+        await addDoc(wishlistCollection, {
+            id: item.id,
+            ...item.data(),
         })
+        res.status(200).json({ message: "Item added to wishlist successfully" })
     } catch (error) {
         console.log(error);
         res.status(400).json({ error: "Something went wrong" })
     }
 }
 
-module.exports.getCart = async (req, res) => {
+module.exports.getWishlist = async (req, res) => {
     try {
         const { userId } = req.query;
         const usersCollection = collection(db, 'users');
         const userDoc = doc(usersCollection, userId);
-        const cartCollection = collection(userDoc, 'cart');
-        const data = await getDocs(cartCollection);
-        const cart = [];
+        const wishlistCollection = collection(userDoc, 'wishlist');
+        const data = await getDocs(wishlistCollection);
+        const wishlist = [];
         for (const d of data.docs) {
-            cart.push({ id: d.id, ...d.data() })
+            wishlist.push({ id: d.id, ...d.data() })
         }
-        res.status(200).json(cart)
+        res.status(200).json(wishlist)
     } catch (error) {
         console.log(error);
         res.status(400).json({ error: "Something went wrong" })
@@ -146,6 +158,49 @@ module.exports.getRelatedItems = async (req, res) => {
         }
         console.log(result)
         res.status(200).json(result || [])
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ error: "Something went wrong" })
+    }
+}
+
+async function sendNotificationToSeller(sellerPushToken, wisher) {
+    // send notification to seller
+    const message = {
+        to: sellerPushToken,
+        sound: 'default',
+        title: 'Interest in your item',
+        body: `${wisher.wisherName}(${wisher.wisherEmail}) is interested in your item ${wisher.itemName}`,
+    };
+    const result = await expo.sendPushNotificationsAsync([message]);
+    console.log('Push notification result:', result);
+}
+
+module.exports.showInterest = async (req, res) => {
+    try {
+        const { userId, itemId } = req.body;
+        const marketCollection = collection(db, 'market');
+        const itemDoc = doc(marketCollection, itemId);
+        const itemData = await getDoc(itemDoc);
+        const item = await getDoc(itemData);
+
+        const usersCollection = collection(db, 'users');
+        const wishersDoc = doc(usersCollection, userId);
+        const wisherData = await getDoc(wishersDoc);
+        const wisher = {
+            id: wisherData.id,
+            wisherName: wisherData.data().name,
+            wisherEmail: wisherData.data().email,
+            itemName: item.title
+        }
+
+        const granterDoc = doc(usersCollection, item.sellerId);
+        const granterData = await getDoc(granterDoc);
+        const granter = granterData.data();
+        // send notification to seller
+        await sendNotificationToSeller(granter.pushToken.data, wisher);
+
+        res.status(200).json({ message: "Interest shown successfully" })
     } catch (error) {
         console.log(error);
         res.status(400).json({ error: "Something went wrong" })
