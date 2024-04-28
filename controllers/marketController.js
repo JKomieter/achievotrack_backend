@@ -1,4 +1,4 @@
-const { collection, addDoc, getDocs, doc, getDoc, query, where } = require("firebase/firestore");
+const { collection, addDoc, getDocs, doc, getDoc, query, where, deleteDoc } = require("firebase/firestore");
 const { db } = require("../config/firebase");
 require('dotenv').config();
 const { Expo } = require('expo-server-sdk');
@@ -222,7 +222,7 @@ module.exports.removeItemFromWishlist = async (req, res) => {
         const data = await getDocs(wishlistCollection);
         for (const d of data.docs) {
             if (d.data().itemId === itemId) {
-                await d.ref.delete();
+                await deleteDoc(d.ref);
                 break;
             }
         }

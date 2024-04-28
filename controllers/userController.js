@@ -113,7 +113,7 @@ module.exports.savePushToken = async (req, res) => {
     try {
         const { userId, pushToken } = req.body;
         const userDoc = doc(usersCollection, userId);
-        await setDoc(userDoc, {
+        pushToken && await setDoc(userDoc, {
             pushToken
         }, { merge: true });
         res.status(200).send({ message: "Push token saved successfully" });
