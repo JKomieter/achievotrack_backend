@@ -212,3 +212,23 @@ module.exports.showItemInterest = async (req, res) => {
         res.status(400).json({ error: "Something went wrong" })
     }
 }
+
+module.exports.removeItemFromWishlist = async (req, res) => {
+    try {
+        const { userId, itemId } = req.body;
+        const usersCollection = collection(db, 'users');
+        const userDoc = doc(usersCollection, userId);
+        const wishlistCollection = collection(userDoc, 'wishlist');
+        const data = await getDocs(wishlistCollection);
+        for (const d of data.docs) {
+            if (d.data().itemId === itemId) {
+                await d.ref.delete();
+                break;
+            }
+        }
+        res.status(200).json({ message: "Item removed from wishlist successfully" })
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ error: "Something went wrong" })
+    }
+}
