@@ -104,6 +104,7 @@ module.exports.getSchedules = async (req, res) => {
                     .hours(scheduleData.start_time.hours)
                     .minutes(scheduleData.start_time.minutes);
                 if (!scheduleData.completed && !scheduleData.sent && startDate.isSameOrBefore(currentTimePlusOneHour)) {
+                    console.log('Sending push notification for:', scheduleData.task);
                     try {
                         const tickets = await sendPushNotification(userPushToken.data, scheduleData.task, new Date(startDate));
                         await updateDoc(scheduleDoc.ref, { sent: true }, { merge: true });
